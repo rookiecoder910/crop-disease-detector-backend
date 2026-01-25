@@ -12,7 +12,7 @@ The backend is designed to be consumed by:
 ## 🚀 Deployed API
 
 🔗 **Base URL:**  
-👉 https://YOUR_DEPLOYED_BACKEND_URL  
+https://crop-disease-detector-backend-a16n.onrender.com/
 
 🔗 **Prediction Endpoint:**  
 POST /predict
