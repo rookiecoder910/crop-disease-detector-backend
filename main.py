@@ -1,37 +1,41 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+
 import numpy as np
 from PIL import Image
 import io
 import os
 
-# Initialize FastAPI app
+import tflite_runtime.interpreter as tflite
+
+
 app = FastAPI(title="Crop Disease Detection API")
 
-# Add CORS middleware to allow requests from browsers
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Load your trained model (Docker-safe absolute path)
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "model", "Model.hdf5")
 
-print(" ** Loading model **")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "model", "model.tflite")
+
+print(" ** Loading TFLite model **")
 print("Model path:", MODEL_PATH)
 
-model = load_model(MODEL_PATH, compile=False)
-print(" ** Model loaded successfully **")
+interpreter = tflite.Interpreter(model_path=MODEL_PATH)
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+print(" ** TFLite model loaded successfully **")
 
 
-# PlantVillage dataset classes (38 classes)
 CLASS_NAMES = [
     'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
     'Blueberry___healthy',
@@ -53,20 +57,18 @@ CLASS_NAMES = [
     'Tomato___Tomato_mosaic_virus', 'Tomato___healthy'
 ]
 
-IMG_HEIGHT, IMG_WIDTH = 224, 224  # Keep consistent with training
-
-# Directory to save uploaded images
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+IMG_HEIGHT = 224
+IMG_WIDTH = 224
 
 
 def preprocess_image(img_bytes: bytes):
-    """Convert uploaded file bytes into preprocessed tensor."""
     img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
     img = img.resize((IMG_WIDTH, IMG_HEIGHT))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
+
+    img_array = np.array(img, dtype=np.float32)
     img_array = img_array / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+
     return img_array
 
 
@@ -78,36 +80,31 @@ async def root():
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     try:
-        # Read file bytes
         contents = await file.read()
 
-        # Save uploaded file
-        file_path = os.path.join(UPLOAD_DIR, file.filename)
-        with open(file_path, "wb") as f:
-            f.write(contents)
-
-        # Preprocess & predict
         input_data = preprocess_image(contents)
-        preds = model.predict(input_data)
-        pred_index = np.argmax(preds)
-        
-        # Get the full class name for prediction
-        prediction = CLASS_NAMES[pred_index]
-        confidence = float(np.max(preds))
-        
-        # Split for additional info
-        class_parts = prediction.split('___')
-        crop = class_parts[0] if len(class_parts) > 0 else "Unknown"
-        disease = class_parts[1].replace("_", " ").title() if len(class_parts) > 1 else "Unknown"
 
-        result = {
-            "prediction": prediction,  # Full class name that frontend expects
+        interpreter.set_tensor(input_details[0]['index'], input_data)
+        interpreter.invoke()
+        preds = interpreter.get_tensor(output_details[0]['index'])
+
+        pred_index = int(np.argmax(preds))
+        confidence = float(np.max(preds))
+
+        prediction = CLASS_NAMES[pred_index]
+
+        crop, disease = prediction.split("___")
+        disease = disease.replace("_", " ").title()
+
+        return JSONResponse(content={
+            "prediction": prediction,
             "crop": crop,
             "disease": disease,
             "confidence": confidence
-        }
-
-        return JSONResponse(content=result)
+        })
 
     except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500
+        )
