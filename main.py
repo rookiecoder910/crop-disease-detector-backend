@@ -7,7 +7,14 @@ from PIL import Image
 import io
 import os
 
-import tflite_runtime.interpreter as tflite
+try:
+    import tflite_runtime.interpreter as tflite
+    print("Using tflite-runtime")
+except ImportError:
+    import tensorflow as tf
+    tflite = tf.lite
+    print("Using TensorFlow Lite from TensorFlow")
+
 
 
 app = FastAPI(title="Crop Disease Detection API")
