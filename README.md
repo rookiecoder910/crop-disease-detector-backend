@@ -18,7 +18,7 @@ https://crop-disease-detector-backend-a16n.onrender.com/
 POST /predict
 
 
-> ⚠️ Replace the URL above with your actual deployed link.
+
 
 ---
 
@@ -82,15 +82,9 @@ API will be available at:
 
 http://127.0.0.1:8000
 🛠️ Major Issues Faced & Fixes Applied
-❌ Issue 1: API not responding from Android app
-Cause: Backend service was powered off
-Fix:
 
-Added API health check
 
-Verified server availability before debugging client
-
-❌ Issue 2: Model file not found in deployment
+❌ Issue 1: Model file not found in deployment
 Cause: Model file ignored by .gitignore and GitHub size limits
 Fix:
 
@@ -100,7 +94,7 @@ Used proper deployment strategy for large ML files
 
 Ensured correct absolute model path (/app/model/Model.hdf5)
 
-❌ Issue 3: Deployment failed due to memory limits
+❌ Issue 2: Deployment failed due to memory limits
 Cause: TensorFlow model exceeding free-tier memory
 Fix:
 
@@ -110,7 +104,7 @@ Optimized model loading
 
 Used Docker-based deployment
 
-❌ Issue 4: CORS errors from frontend
+❌ Issue 3: CORS errors from frontend
 Cause: Missing CORS configuration
 Fix:
 
