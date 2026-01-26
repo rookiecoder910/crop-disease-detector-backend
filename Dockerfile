@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# System deps required by TensorFlow
+# System deps required by TensorFloww
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgl1 \
