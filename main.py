@@ -6,14 +6,10 @@ import numpy as np
 from PIL import Image
 import io
 import os
+import tensorflow as tf
 
-try:
-    import tensorflow as tf
-    tflite = tf.lite
-    print("Using TensorFlow Lite from TensorFlow")
-except ImportError:
-    import tflite_runtime.interpreter as tflite
-    print("Using tflite-runtime")
+tflite = tf.lite
+print("Using TensorFlow Lite from TensorFlow")
 
 
 

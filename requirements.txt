@@ -1,7 +1,6 @@
 fastapi==0.117.1
 uvicorn==0.36.0
-tensorflow-cpu==2.16.1
-tflite-runtime==2.14.0
+tensorflow-cpu==2.15.0
 h5py==3.14.0
 numpy==1.26.4
 pillow==11.3.0
