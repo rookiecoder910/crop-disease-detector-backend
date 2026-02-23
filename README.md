@@ -92,7 +92,7 @@ Removed model from .gitignore
 
 Used proper deployment strategy for large ML files
 
-Ensured correct absolute model path (/app/model/Model.hdf5)
+Ensured correct absolute model path (/app/model/cropsense_model.h5)
 
 ❌ Issue 2: Deployment failed due to memory limits
 Cause: TensorFlow model exceeding free-tier memory
@@ -114,7 +114,7 @@ Added CORSMiddleware with allowed origins
 .
 ├── main.py               # FastAPI application
 ├── model/
-│   └── Model.hdf5        # Trained CNN model
+│   └── cropsense_model.h5        # Trained CNN model
 ├── uploads/              # Uploaded images (runtime)
 ├── requirements.txt
 ├── Dockerfile
