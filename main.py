@@ -25,7 +25,7 @@ app.add_middleware(
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ── Disease detection model (TFLite) ──────────────────────────────────────────
+#Disease detection model (TFLite)
 MODEL_PATH = os.path.join(BASE_DIR, "model", "model.tflite")
 
 print(" ** Loading TFLite disease model **")
@@ -39,7 +39,7 @@ output_details = interpreter.get_output_details()
 
 print(" ** TFLite disease model loaded successfully **")
 
-# ── Plant / Leaf detector model (Keras .h5) ───────────────────────────────────
+#Plant / Leaf detector model (Keras .h5) 
 PLANT_DETECTOR_PATH = os.path.join(BASE_DIR, "model", "plant_detector.h5")
 
 print(" ** Loading plant detector model **")
@@ -123,14 +123,14 @@ async def predict(file: UploadFile = File(...)):
     try:
         contents = await file.read()
 
-        # ── Step 1: Gate — check if it's a leaf/crop image ───────────────────
+        # check if it's a leaf/crop image
         if not is_leaf_image(contents):
             return JSONResponse(content={
                 "is_leaf": False,
                 "message": "Please upload a leaf image for correct diagnosis"
             })
 
-        # ── Step 2: Disease detection via TFLite ──────────────────────────────
+     
         input_data = preprocess_image(contents)
 
         interpreter.set_tensor(input_details[0]['index'], input_data)
