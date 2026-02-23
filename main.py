@@ -8,12 +8,12 @@ import io
 import os
 
 try:
-    import tflite_runtime.interpreter as tflite
-    print("Using tflite-runtime")
-except ImportError:
     import tensorflow as tf
     tflite = tf.lite
     print("Using TensorFlow Lite from TensorFlow")
+except ImportError:
+    import tflite_runtime.interpreter as tflite
+    print("Using tflite-runtime")
 
 
 
