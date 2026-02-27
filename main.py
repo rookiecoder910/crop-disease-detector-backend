@@ -26,7 +26,7 @@ app.add_middleware(
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 #Disease detection model (TFLite)
-MODEL_PATH = os.path.join(BASE_DIR, "model", "model.tflite")
+MODEL_PATH = os.path.join(BASE_DIR, "model", "model_origin.tflite")
 
 print(" ** Loading TFLite disease model **")
 print("Model path:", MODEL_PATH)
