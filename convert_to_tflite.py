@@ -2,8 +2,8 @@ import tensorflow as tf
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-HDF5_PATH = os.path.join(BASE_DIR, "model", "Model.hdf5")
-TFLITE_PATH = os.path.join(BASE_DIR, "model", "model_origin.tflite")
+HDF5_PATH = os.path.join(BASE_DIR, "model", "cropsense_model.h5")
+TFLITE_PATH = os.path.join(BASE_DIR, "model", "model.tflite")
 
 print("Loading HDF5 model...")
 model = tf.keras.models.load_model(HDF5_PATH, compile=False)
